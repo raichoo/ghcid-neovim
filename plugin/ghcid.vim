@@ -31,7 +31,7 @@ function! ghcid#stopGhcid()
     call jobsend(g:haskell_ghcid, ":quit\n")
     call ghcid#cleanupGhcid()
   endif
-endfunctio
+endfunction
 
 function! ghcid#cleanupGhcid()
   if exists('g:haskell_ghcid')
