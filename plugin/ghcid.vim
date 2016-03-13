@@ -24,6 +24,7 @@ function! ghcid#reloadGhcid()
 endfunction
 
 function! ghcid#startGhcid()
+  setfiletype ghcid
   let l:cwd = getcwd()
   if !has_key(g:ghcid_running, l:cwd)
     let g:ghcid_running[l:cwd] = termopen('stack ghci', { 'on_exit': function('ghcid#cleanupGhcid') })
