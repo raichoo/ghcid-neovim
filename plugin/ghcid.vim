@@ -4,38 +4,45 @@ endif
 
 let g:loaded_ghcid = 1
 
+let g:ghcid_running = {}
+
 function! ghcid#loadGhcid()
-  if exists('g:haskell_ghcid')
-    call jobsend(g:haskell_ghcid, ":load Main\n")
-    call jobsend(g:haskell_ghcid, ":main\n")
+  let l:cwd = getcwd()
+  if has_key(g:ghcid_running,l:cwd)
+    call jobsend(g:ghcid_running[l:cwd], ":load Main\n")
+    call jobsend(g:ghcid_running[l:cwd], ":main\n")
     call jobstart('inotifywait -re modify .', { 'on_exit': function('ghcid#reloadGhcid') })
   endif
 endfunction
 
 function! ghcid#reloadGhcid()
-  if exists('g:haskell_ghcid')
-    call jobsend(g:haskell_ghcid, ":reload\n")
+  let l:cwd = getcwd()
+  if has_key(g:ghcid_running, l:cwd)
+    call jobsend(g:ghcid_running[l:cwd], ":reload\n")
     call ghcid#loadGhcid()
   endif
 endfunction
 
 function! ghcid#startGhcid()
-  if !exists('g:haskell_ghcid')
-    let g:haskell_ghcid = termopen('stack ghci', { 'on_exit': function('ghcid#cleanupGhcid') })
+  let l:cwd = getcwd()
+  if !has_key(g:ghcid_running, l:cwd)
+    let g:ghcid_running[l:cwd] = termopen('stack ghci', { 'on_exit': function('ghcid#cleanupGhcid') })
     call ghcid#loadGhcid()
   endif
 endfunction
 
 function! ghcid#stopGhcid()
-  if exists('g:haskell_ghcid')
-    call jobsend(g:haskell_ghcid, ":quit\n")
+  let l:cwd = getcwd()
+  if has_key(g:ghcid_running, l:cwd)
+    call jobsend(g:ghcid_running[l:cwd], ":quit\n")
     call ghcid#cleanupGhcid()
   endif
 endfunction
 
 function! ghcid#cleanupGhcid()
-  if exists('g:haskell_ghcid')
-    unlet g:haskell_ghcid
+  let l:cwd = getcwd()
+  if has_key(g:ghcid_running, l:cwd)
+    unlet g:ghcid_running[l:cwd]
   endif
 endfunction
 
