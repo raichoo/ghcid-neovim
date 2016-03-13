@@ -23,12 +23,16 @@ function! ghcid#reloadGhcid()
   endif
 endfunction
 
-function! ghcid#startGhcid()
+function! ghcid#startGhcid(...)
   setfiletype ghcid
   au BufUnload <buffer> call ghcid#stopGhcid()
+  let l:com = ''
+  if a:0 == 1
+    let l:com = ' ' . a:1
+  endif
   let l:cwd = getcwd()
   if !has_key(g:ghcid_running, l:cwd)
-    let g:ghcid_running[l:cwd] = termopen('stack ghci', { 'on_exit': function('ghcid#cleanupGhcid') })
+    let g:ghcid_running[l:cwd] = termopen('stack ghci' . l:com, { 'on_exit': function('ghcid#cleanupGhcid') })
     call ghcid#loadGhcid()
   endif
 endfunction
@@ -48,7 +52,7 @@ function! ghcid#cleanupGhcid()
   endif
 endfunction
 
-command! GhcidStart call ghcid#startGhcid()
+command! -nargs=? GhcidStart call ghcid#startGhcid(<f-args>)
 command! GhcidStop call ghcid#stopGhcid()
 command! GhcidReload call ghcid#reloadGhcid()
 
