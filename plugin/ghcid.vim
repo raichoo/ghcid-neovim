@@ -11,7 +11,7 @@ function! ghcid#loadGhcid()
   if has_key(g:ghcid_running,l:cwd)
     call jobsend(g:ghcid_running[l:cwd], ":load Main\n")
     call jobsend(g:ghcid_running[l:cwd], ":main\n")
-    call jobstart('inotifywait -re modify .', { 'on_exit': function('ghcid#reloadGhcid') })
+    call jobstart('inotifywait -re modify ' . l:cwd, { 'on_exit': function('ghcid#reloadGhcid') })
   endif
 endfunction
 
