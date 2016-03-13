@@ -25,6 +25,7 @@ endfunction
 
 function! ghcid#startGhcid()
   setfiletype ghcid
+  au BufUnload <buffer> call ghcid#stopGhcid()
   let l:cwd = getcwd()
   if !has_key(g:ghcid_running, l:cwd)
     let g:ghcid_running[l:cwd] = termopen('stack ghci', { 'on_exit': function('ghcid#cleanupGhcid') })
@@ -51,4 +52,3 @@ command! GhcidStart call ghcid#startGhcid()
 command! GhcidStop call ghcid#stopGhcid()
 command! GhcidReload call ghcid#reloadGhcid()
 
-au VimLeavePre *.hs call ghcid#stopGhcid()
